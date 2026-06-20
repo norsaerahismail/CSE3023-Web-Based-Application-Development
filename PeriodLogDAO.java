@@ -104,6 +104,31 @@ public class PeriodLogDAO {
         }
         return logs;
     }
+    
+    /** 
+     * Update rekod haid
+     */
+     
+    public boolean updateLog(PeriodLog log) {
+    String sql = "UPDATE period_logs SET startDate = ?, endDate = ?, bloodFlowType = ?, symptoms = ?, notes = ? WHERE dataID = ? AND userID = ?";
+    
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        
+        ps.setDate(1, log.getStartDate());
+        ps.setDate(2, log.getEndDate());
+        ps.setString(3, log.getBloodFlowType());
+        ps.setString(4, log.getSymptoms());
+        ps.setString(5, log.getNotes());
+        ps.setInt(6, log.getDataID());
+        ps.setInt(7, log.getUserID());
+        
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        System.err.println("[PeriodLogDAO] Gagal kemaskini log: " + e.getMessage());
+    }
+    return false;
+}
 
     /**
      * Padam rekod haid berdasarkan dataID.

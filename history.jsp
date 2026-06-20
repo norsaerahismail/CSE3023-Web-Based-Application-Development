@@ -265,11 +265,41 @@
             <% } %>
 
             <!-- Butang Padam -->
-            <a href="<%= request.getContextPath() %>/delete-log?id=<%= log.getDataID() %>"
+               <a href="<%= request.getContextPath() %>/delete-log?id=<%= log.getDataID() %>"
                class="del-btn"
-               onclick="return confirm('Padam rekod ini? Tindakan ini tidak boleh dibatalkan.')">
-                <i class="fas fa-trash-alt"></i> Padam Rekod
+               style="background:#ff4d4d; color:white; padding:8px 12px; border-radius:6px; text-decoration:none; display:inline-block; margin-right:10px;"
+               onclick=\"return confirm('Padam rekod ini? Tindakan ini tidak boleh dibatalkan.')\">
+                <i class=\"fas fa-trash-alt\"></i> Padam Rekod
             </a>
+
+            <button onclick="document.getElementById('editForm-<%= log.getDataID() %>').style.display='block'" 
+                    style="background:#4a90e2; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;">
+                <i class="fas fa-edit"></i> Kemaskini Tarikh
+            </button>
+
+            <div id="editForm-<%= log.getDataID() %>" style="display:none; margin-top:15px; padding:15px; background:#fff; border:1px solid #ddd; border-radius:8px;">
+                <h5 style="margin-bottom:10px; color:#555;">Kemaskini Tempoh Kitaran</h5>
+                <form action="<%= request.getContextPath() %>/edit-log" method="POST">
+                    <input type="hidden" name="dataID" value="<%= log.getDataID() %>">
+                    <input type="hidden" name="bloodFlow" value="<%= log.getBloodFlowType() %>">
+                    <input type="hidden" name="notes" value="<%= log.getNotes() != null ? log.getNotes() : "" %>">
+                    
+                    <div style="margin-bottom:10px;">
+                        <label style="font-size:12px; display:block; margin-bottom:4px;">Tarikh Mula:</label>
+                        <input type="date" name="startDate" value="<%= log.getStartDate() %>" required style="padding:6px; width:100%; border:1px solid #ccc; border-radius:4px;">
+                    </div>
+                    
+                    <div style="margin-bottom:10px;">
+                        <label style="font-size:12px; display:block; margin-bottom:4px;">Tarikh Tamat:</label>
+                        <input type="date" name="endDate" value="<%= log.getEndDate() %>" required style="padding:6px; width:100%; border:1px solid #ccc; border-radius:4px;">
+                    </div>
+                    
+                    <div style="text-align:right;">
+                        <button type="button" onclick="document.getElementById('editForm-<%= log.getDataID() %>').style.display='none'" style="background:#aaa; color:white; border:none; padding:5px 10px; border-radius:4px; margin-right:5px; cursor:pointer;">Batal</button>
+                        <button type="submit" style="background:#2ecc71; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Simpan Perubahan</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
     <% }} %>

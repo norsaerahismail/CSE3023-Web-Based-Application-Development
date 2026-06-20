@@ -1,12 +1,18 @@
 package com.moonbae.servlet;
 
+import com.moonbae.dao.PeriodLogDAO;
 import com.moonbae.dao.UserDAO;
+import com.moonbae.model.PeriodLog;
+import com.moonbae.model.Profile;
 import com.moonbae.model.User;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 /**
  * Controller: AuthServlet
@@ -17,22 +23,49 @@ import java.io.IOException;
 public class AuthServlet extends HttpServlet {
 
     private final UserDAO userDAO = new UserDAO();
+    private final PeriodLogDAO logDAO = new PeriodLogDAO();
 
     // ── GET: Paparkan halaman berkaitan ──────────────────────
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String action = request.getParameter("action");
-
-        if ("logout".equals(action)) {
-            // Musnahkan sesi dan ubah hala ke halaman login
-            HttpSession session = request.getSession(false);
-            if (session != null) session.invalidate();
+        HttpSession session = request.getSession(false);
+        // Kalau tak login lagi, tendang pergi page login
+        if (session == null || session.getAttribute("userID") == null) {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
-        } else {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
         }
+        
+        int userID = (int) session.getAttribute("userID");
+
+        // 1. Ambil data Profile dari Database
+        Profile profile = userDAO.getProfileByUserID(userID);
+        request.setAttribute("profile", profile);
+
+        // 2. Ambil data Logs dari Database
+        List<PeriodLog> recentLogs = logDAO.getLogsByUserID(userID);
+        request.setAttribute("recentLogs", recentLogs != null ? recentLogs : new ArrayList<PeriodLog>());
+        request.setAttribute("monthLogs", recentLogs != null ? recentLogs : new ArrayList<PeriodLog>()); // Dummy fallback untuk kalendar
+
+        // 3. Setup Dummy/Mock Data untuk Calendar & Attributes yang dashboard.jsp mintak (Bagi tak Crash)
+        request.setAttribute("prediction", null);
+        request.setAttribute("currentCycleDay", 0);
+        request.setAttribute("cycleProgress", 0);
+        request.setAttribute("activeReminder", "Selamat Datang ke MoonBae!");
+        
+        Calendar cal = Calendar.getInstance();
+        request.setAttribute("today", cal.get(Calendar.DAY_OF_MONTH));
+        request.setAttribute("daysInMonth", cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+        
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        request.setAttribute("firstDayOfWeek", cal.get(Calendar.DAY_OF_WEEK));
+        request.setAttribute("monthName", "Semasa");
+        request.setAttribute("currentYear", cal.get(Calendar.YEAR));
+        request.setAttribute("currentMonth", cal.get(Calendar.MONTH));
+
+        // 4. Hantar data ke dashboard.jsp
+        request.getRequestDispatcher("/dashboard.jsp").forward(request, response);
     }
 
     // ── POST: Proses borang Login / Register ─────────────────
@@ -40,19 +73,7 @@ public class AuthServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.setCharacterEncoding("UTF-8");
-        String action = request.getParameter("action");
-
-        switch (action == null ? "" : action) {
-            case "login":
-                handleLogin(request, response);
-                break;
-            case "register":
-                handleRegister(request, response);
-                break;
-            default:
-                response.sendRedirect(request.getContextPath() + "/login.jsp");
-        }
+        doGet(request, response);
     }
 
     // ── Proses Log Masuk ─────────────────────────────────────
@@ -66,6 +87,7 @@ public class AuthServlet extends HttpServlet {
         if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
             request.setAttribute("error", "Sila isi semua ruangan.");
             request.getRequestDispatcher("/login.jsp").forward(request, response);
+            
             return;
         }
 

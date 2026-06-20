@@ -1,3 +1,9 @@
+<%-- 
+    Document   : login
+    Created on : 20 Jun 2026, 11:59:28 pm
+    Author     : ASUS
+--%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     // Jika pengguna sudah log masuk, ubah hala ke dashboard
@@ -182,7 +188,7 @@
                 <div class="alert alert-success"><i class="fas fa-check-circle"></i> <%= request.getAttribute("success") %></div>
             <% } %>
 
-            <form method="post" action="<%= request.getContextPath() %>/auth">
+            <form action="<%= request.getContextPath() %>/auth?action=login" method="POST">
                 <input type="hidden" name="action" value="login">
 
                 <div class="form-group">
@@ -213,7 +219,7 @@
                 <div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <%= request.getAttribute("regError") %></div>
             <% } %>
 
-            <form method="post" action="<%= request.getContextPath() %>/auth">
+            <form action="<%= request.getContextPath() %>/auth?action=register" method="POST">
                 <input type="hidden" name="action" value="register">
 
                 <div class="form-group">
@@ -274,4 +280,3 @@
 </script>
 </body>
 </html>
-

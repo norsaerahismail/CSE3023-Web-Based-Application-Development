@@ -268,7 +268,7 @@
     <div class="nav-links">
         <a href="<%= request.getContextPath() %>/dashboard" class="active"><i class="fas fa-home"></i> Home</a>
         <a href="<%= request.getContextPath() %>/tracking" class="btn-add"><i class="fas fa-plus"></i> Tambah Rekod</a>
-        <a href="<%= request.getContextPath() %>/history"><i class="fas fa-history"></i> Sejarah</a>
+        <a href="<%= request.getContextPath() %>/history" class="nav-item"<i class="fas fa-history"></i> Sejarah</a>
         <a href="<%= request.getContextPath() %>/auth?action=logout" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Log Keluar</a>
     </div>
 </nav>
@@ -399,4 +399,3 @@
 </main>
 </body>
 </html>
-
